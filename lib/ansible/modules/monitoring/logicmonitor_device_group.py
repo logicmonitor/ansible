@@ -30,8 +30,8 @@ try:
     # Look for simplejson if that's the case
     try:
         if (
-         not isinstance(json.loads, types.FunctionType) or
-         not isinstance(json.dumps, types.FunctionType)
+            not isinstance(json.loads, types.FunctionType) or
+            not isinstance(json.dumps, types.FunctionType)
         ):
             raise ImportError
     except AttributeError:
@@ -283,7 +283,7 @@ def create_device_group(client, device_group, module):
     return add_obj(client, device_group, module)
 
 
-def delete_device_group(client, device_group, module):
+def delete_obj(client, device_group, module):
     module.debug('deleting device group ' + str(device_group.name))
     resp = None
     try:
@@ -313,7 +313,7 @@ def update_obj(client, device_group, module):
         resp = client.update_device_group_by_id(
             str(device_group.id),
             device_group
-         )
+        )
     except ApiException as e:
         err = (
             'Exception when calling update_device_group_by_id: ' + str(e) +
@@ -352,7 +352,7 @@ def ensure_present(params, module):
         if not module.check_mode:
             add_obj(client, obj, module)
         module.exit_json(changed=True)
-    if not compare_obj(obj, obj):
+    if not compare_obj(obj, found_obj):
         if not module.check_mode:
             # set known fields required for updating object
             obj = set_update_fields(obj, found_obj)

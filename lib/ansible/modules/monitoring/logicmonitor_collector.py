@@ -29,8 +29,8 @@ try:
     # Look for simplejson if that's the case
     try:
         if (
-         not isinstance(json.loads, types.FunctionType) or
-         not isinstance(json.dumps, types.FunctionType)
+            not isinstance(json.loads, types.FunctionType) or
+            not isinstance(json.dumps, types.FunctionType)
         ):
             raise ImportError
     except AttributeError:
@@ -542,7 +542,7 @@ def main():
             collector_size=dict(
                 required='small',
                 default=None,
-                choices=['nano', 'small', 'medium', large]
+                choices=['nano', 'small', 'medium', 'large']
             ),
             collector_group=dict(required=False, default='/'),
             description=dict(required=False, default=None),
