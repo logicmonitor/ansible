@@ -19,8 +19,15 @@
 
 import logicmonitor
 from logicmonitor.rest import ApiException
+import os
+import socket
+import sys
 import types
 
+AGENT_DIRECTORY = 'agent'
+DEFAULT_OS = 'Linux'
+INSTALL_PATH = '/usr/local/logicmonitor/'
+UNINSTALL_PATH = INSTALL_PATH + AGENT_DIRECTORY + '/bin/uninstall.pl'
 
 HAS_LIB_JSON = True
 try:
