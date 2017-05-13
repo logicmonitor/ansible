@@ -17,40 +17,6 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA'''
 
-import copy
-import logicmonitor
-from logicmonitor.rest import ApiException
-import types
-
-
-HAS_LIB_JSON = True
-try:
-    import json
-    # Detect the python-json library which is incompatible
-    # Look for simplejson if that's the case
-    try:
-        if (
-            not isinstance(json.loads, types.FunctionType) or
-            not isinstance(json.dumps, types.FunctionType)
-        ):
-            raise ImportError
-    except AttributeError:
-        raise ImportError
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        print(
-            '\n{"msg": "Error: ansible requires the stdlib json or ' +
-            'simplejson module, neither was found!", "failed": true}'
-        )
-        HAS_LIB_JSON = False
-    except SyntaxError:
-        print(
-            '\n{"msg": "SyntaxError: probably due to installed simplejson ' +
-            'being for a different python version", "failed": true}'
-        )
-        HAS_LIB_JSON = False
 
 ANSIBLE_METADATA = {'metadata_version': '1.0',
                     'status': ['preview'],
@@ -135,6 +101,42 @@ EXAMPLES = '''
 ---
 ...
 '''
+
+
+import copy
+import logicmonitor
+from logicmonitor.rest import ApiException
+import types
+
+
+HAS_LIB_JSON = True
+try:
+    import json
+    # Detect the python-json library which is incompatible
+    # Look for simplejson if that's the case
+    try:
+        if (
+            not isinstance(json.loads, types.FunctionType) or
+            not isinstance(json.dumps, types.FunctionType)
+        ):
+            raise ImportError
+    except AttributeError:
+        raise ImportError
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        print(
+            '\n{"msg": "Error: ansible requires the stdlib json or ' +
+            'simplejson module, neither was found!", "failed": true}'
+        )
+        HAS_LIB_JSON = False
+    except SyntaxError:
+        print(
+            '\n{"msg": "SyntaxError: probably due to installed simplejson ' +
+            'being for a different python version", "failed": true}'
+        )
+        HAS_LIB_JSON = False
 
 
 def get_client(params, module):
