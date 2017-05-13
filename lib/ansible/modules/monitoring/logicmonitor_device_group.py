@@ -293,7 +293,7 @@ def delete_obj(client, device_group, module):
     module.debug('deleting device group ' + str(device_group.name))
     resp = None
     try:
-        resp = client.delete_device_group_by_id(device_group.id)
+        resp = client.delete_device_group_by_id(str(device_group.id))
     except ApiException as e:
         err = (
             'Exception when calling delete_device_group_by_id: ' + str(e) +
@@ -354,7 +354,7 @@ def ensure_present(params, module):
     obj = get_object(client, params, module)
 
     found_obj = find_obj(client, obj.full_path, module)
-    if found_group is None:
+    if found_obj is None:
         if not module.check_mode:
             add_obj(client, obj, module)
         module.exit_json(changed=True)
