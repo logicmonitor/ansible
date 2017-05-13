@@ -271,11 +271,11 @@ def remove_system_props(props):
         name = ''
         value = ''
 
-        if type(item) == 'dict':
+        if isinstance(item, 'dict'):
             if item['name'].startswith('system'):
                 name = item['name']
                 value = item['value']
-        elif type(item) == logicmonitor.NameAndValue:
+        elif isinstance(item, logicmonitor.NameAndValue):
             name = item.name
             value = item.value
         ret[name] = value
