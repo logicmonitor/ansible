@@ -126,6 +126,7 @@ def get_client(params, module):
     )
     logicmonitor.configuration.api_key['id'] = params['access_id']
     logicmonitor.configuration.api_key['Authorization'] = params['access_key']
+    logicmonitor.configuration.temp_folder_path = INSTALL_PATH
 
     # create an instance of the API class
     return logicmonitor.DefaultApi(logicmonitor.ApiClient())
