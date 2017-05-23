@@ -376,8 +376,6 @@ def main():
 
 
 from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
-from ansible.module_utils.urls import open_url
 
 
 if __name__ == '__main__':
