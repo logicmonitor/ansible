@@ -146,9 +146,9 @@ EXAMPLES = '''
       account: '{{ account }}'
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
-      state: absent
       name: server1.test.net
       preferred_collector_id: 1
+      state: absent
 '''
 
 
