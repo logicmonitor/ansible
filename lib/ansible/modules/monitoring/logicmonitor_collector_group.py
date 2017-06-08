@@ -83,7 +83,6 @@ options:
 '''
 
 EXAMPLES = '''
----
 # creating a collector group
 ---
 - hosts: hosts
@@ -118,7 +117,6 @@ EXAMPLES = '''
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
       state: absent
-      description: My collector group created by Ansible
       name: AnsibleCollectors
     delegate_to: localhost
 ...
