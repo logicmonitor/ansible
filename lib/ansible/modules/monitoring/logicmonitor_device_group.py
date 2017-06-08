@@ -103,7 +103,45 @@ options:
 '''
 
 EXAMPLES = '''
+# creating a device group
 ---
+- hosts: hosts
+  remote_user: '{{ username }}'
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create collector group
+    logicmonitor_collector_group:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      description: My device group created by Ansible
+      full_path: /AnsibleDevices/WebServers
+      properties:
+        snmp.community: commstring
+        type: webservers
+    delegate_to: localhost
+
+# removing a device group
+---
+- hosts: hosts
+  remote_user: '{{ username }}'
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create collector group
+    logicmonitor_collector_group:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: absent
+      full_path: /AnsibleDevices/WebServers
+    delegate_to: localhost
 ...
 '''
 
