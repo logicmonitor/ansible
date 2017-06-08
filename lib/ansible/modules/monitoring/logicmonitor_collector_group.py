@@ -275,7 +275,7 @@ def delete_obj(client, collector_group, module):
     module.debug('deleting collector group ' + str(collector_group.name))
     resp = None
     try:
-        resp = client.delete_collector_group_by_id(collector_group.id)
+        resp = client.delete_collector_group_by_id(str(collector_group.id))
     except ApiException as e:
         err = (
             'Exception when calling delete_collector_group_by_id: ' + str(e) +
