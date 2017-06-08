@@ -36,64 +36,49 @@ success:
 DOCUMENTATION = '''
 ---
 module: logicmonitor_devicegroup
-short_description: Manage your LogicMonitor account through Ansible Playbooks
+short_description: Manage LogicMonitor collector groups
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.
   - This module manages collector groups within your LogicMonitor account.
-version_added: '2.2'
+version_added: '2.4'
 author: [Jeff Wozniak (@woz5999)]
 notes:
   - You must have an existing LogicMonitor account for this module to function.
+  - The specified token Access Id and Access Key must have sufficient permission to perform the requested actions
+  - This module is recommended for use from a single host using local_action or delegate_to
 requirements: ['An existing LogicMonitor account', 'Linux']
 options:
   state:
     description:
+      - Whether to ensure that the resource is present or absent
     required: true
     default: null
     choices: ['present', 'absent']
-  company:
+  account:
     description:
-      - The LogicMonitor account company name. If you would log in to your account at 'superheroes.logicmonitor.com' you would use 'superheroes.'
+      - LogicMonitor account name
     required: true
     default: null
   access_id:
     description:
-      - Your API Token Access ID
+      - LogicMonitor API Token Access ID
     required: true
     default: null
   access_key:
     description:
-        - Your API Token Access Key
+      - LogicMonitor API Token Access Key
     required: true
     default: null
   description:
     description:
-      - The long text description of the collector group in your LogicMonitor account.
+      - The description of the Collector Group
     required: false
     default: ''
-  properties:
+  name:
     description:
-      - A dictionary of properties to set on the collector group.
-    required: false
-    default: {}
-  full_path:
-    description:
-      - The full_path of the collector group object you would like to manage.
-      - Recommend running on a single Ansible host.
+      - The name of the Collector Group
     required: true
-    default: null
-  applies_to:
-    description:
-      - Custom applies to query for dynamic collector groups
-      - If set, this will create a dynamic collector group
-    required: false
-    default: null
-  disable_alerting:
-    description:
-      - A boolean flag to turn alerting on or off for the collector group.
-    required: false
-    default: false
-    choices: [true, false]
+    default: hostname -f
 ...
 '''
 
@@ -143,7 +128,7 @@ def get_client(params, module):
 
     logicmonitor.configuration.host = logicmonitor.configuration.host.replace(
         'localhost',
-        params['company'] + '.logicmonitor.com'
+        params['account'] + '.logicmonitor.com'
     )
     logicmonitor.configuration.api_key['id'] = params['access_id']
     logicmonitor.configuration.api_key['Authorization'] = params['access_key']
@@ -359,7 +344,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(required=True, default=None, choices=STATE),
-            company=dict(required=True, default=None),
+            account=dict(required=True, default=None),
             access_id=dict(required=True, default=None),
             access_key=dict(required=True, default=None, no_log=True),
 

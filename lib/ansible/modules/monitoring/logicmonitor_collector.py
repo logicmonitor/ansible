@@ -35,42 +35,106 @@ success:
 
 DOCUMENTATION = '''
 ---
-module: logicmonitor
-short_description: Manage your LogicMonitor account through Ansible Playbooks
+module: logicmonitor_collector
+short_description: Manage LogicMonitor collectors
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.
   - This module manages collectors within your LogicMonitor account.
-version_added: '2.2'
+version_added: '2.4'
 author: [Jeff Wozniak (@woz5999)]
 notes:
   - You must have an existing LogicMonitor account for this module to function.
+  - The specified token Access Id and Access Key must have sufficient permission to perform the requested actions
 requirements: ['An existing LogicMonitor account', 'Linux']
 options:
   state:
     description:
+      - Whether to ensure that the resource is present or absent
     required: true
     default: null
     choices: ['present', 'absent']
-  company:
+  account:
     description:
-      - The LogicMonitor account company name. If you would log in to your account at 'superheroes.logicmonitor.com' you would use 'superheroes.'
+      - LogicMonitor account name
     required: true
     default: null
   access_id:
     description:
-      - Your API Token Access ID
+      - LogicMonitor API Token Access ID
     required: true
     default: null
   access_key:
     description:
-        - Your API Token Access Key
+      - LogicMonitor API Token Access Key
     required: true
     default: null
+  bakckup_collector_id:
+    description:
+      - The Id of the failover Collector configured for this Collector
+    required: false
+    default: null
+    type: int
+  collector_group:
+    description:
+      - The Id of the group the Collector is in
+    required: false
+    default: /
+  collector_size:
+    description:
+      - The size of the Collector to install
+      - small requires 2GB memory)
+      - medium requires 4GB memory)
+      - large requires 8GB memory)
+    required: false
+    default: small
+    choices: ['nano', 'small', 'medium', 'large']
   description:
     description:
-      - The long text description of the collector in your LogicMonitor account.
+       - The Collector's description
     required: false
-    default: ''
+    default: null
+  enable_fail_back:
+    description:
+      - Whether or not automatic failback is enabled for the Collector
+    required: false
+    default: False
+    type: bool
+  escalating_chain_id:
+    description:
+      - The Id of the escalation chain associated with this Collector
+    required: false
+    default: 1
+    type: int
+   hostname:
+    description:
+      - The Collector's hostname
+    required: false
+    default: null
+   id:
+    description:
+      - The Id of an existing Collector provision
+      - The specified Collector Id must already exist in order to use this option
+    required: false
+    default: null
+    type: int
+   resend_interval:
+    description:
+      - The interval, in minutes, after which alert notifications for the Collector will be resent
+    required: false
+    default: 15
+    type: int
+   suppress_alert_clear:
+    description:
+      - Whether alert clear notifications are suppressed for the Collector
+    required: false
+    default: False
+    type: bool
+   us_ea:
+    description:
+      - If true, the latest EA Collector version will be used
+    required: false
+    default: False
+    type: bool
 ...
 '''
 
@@ -122,7 +186,7 @@ def get_client(params, module):
 
     logicmonitor.configuration.host = logicmonitor.configuration.host.replace(
         'localhost',
-        params['company'] + '.logicmonitor.com'
+        params['account'] + '.logicmonitor.com'
     )
     logicmonitor.configuration.api_key['id'] = params['access_id']
     logicmonitor.configuration.api_key['Authorization'] = params['access_key']
@@ -543,14 +607,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(required=True, default=None, choices=STATE),
-            company=dict(required=True, default=None),
+            account=dict(required=True, default=None),
             access_id=dict(required=True, default=None),
             access_key=dict(required=True, default=None, no_log=True),
 
             backup_collector_id=dict(required=False, default=None, type='int'),
             collector_size=dict(
-                required='small',
-                default=None,
+                required=False,
+                default='small',
                 choices=['nano', 'small', 'medium', 'large']
             ),
             collector_group=dict(required=False, default='/'),

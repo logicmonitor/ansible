@@ -35,74 +35,81 @@ success:
 
 DOCUMENTATION = '''
 ---
-module: logicmonitor
-short_description: Manage your LogicMonitor account through Ansible Playbooks
+module: logicmonitor_device
+short_description: Manage LogicMonitor devices
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.
   - This module manages devices within your LogicMonitor account.
-version_added: '2.2'
+version_added: '2.4'
 author: [Jeff Wozniak (@woz5999)]
 notes:
   - You must have an existing LogicMonitor account for this module to function.
+  - The specified token Access Id and Access Key must have sufficient permission to perform the requested actions
 requirements: ['An existing LogicMonitor account', 'Linux']
 options:
   state:
     description:
+      -       - Whether to ensure that the resource is present or absent
     required: true
     default: null
     choices: ['present', 'absent']
-  company:
+  account:
     description:
-      - The LogicMonitor account company name. If you would log in to your account at 'superheroes.logicmonitor.com' you would use 'superheroes.'
+      - LogicMonitor account name
     required: true
     default: null
   access_id:
     description:
-      - Your API Token Access ID
+      - LogicMonitor API Token Access ID
     required: true
     default: null
   access_key:
     description:
-        - Your API Token Access Key
+      - LogicMonitor API Token Access Key
     required: true
     default: null
+
+
+
+
   preferred_collector_id:
     description:
-      - The ID of the preferred collector assigned to monitor the device
+      - The Id of the preferred collector assigned to monitor the device
     required: true
     default: null
   name:
     description:
-      - The hostname of a device in your LogicMonitor account.
+      - The host name or IP address of the device
     required: false
-    default: 'hostname -f'
+    default: hostname -f
   display_name:
     description:
-      - The display name of a device in your LogicMonitor account.
+      - The display name of the device
     required: false
-    default: 'hostname -f'
+    default: hostname -f
   description:
     description:
-      - The long text description of the device in your LogicMonitor account.
+      - The device description
     required: false
     default: ''
   properties:
     description:
-      - A dictionary of properties to set on the LogicMonitor device.
-      - This parameter will add or update existing properties in your LogicMonitor account.
+      - A dictionary of properties associated with this device group
     required: false
     default: {}
+    type: dict
   groups:
     description:
-        - A list of groups that the device should be a member of.
+        - A list of groups that the device should be a member of
     required: false
     default: []
+    type: list
   disable_alerting:
     description:
-      - A boolean flag to turn alerting on or off for the device.
+      - Indicates whether alerting is disabled (true) or enabled (false) for this device
     required: false
     default: false
-    choices: [true, false]
+    type: bool
 
 ...
 '''
@@ -149,7 +156,7 @@ def get_client(params, module):
 
     logicmonitor.configuration.host = logicmonitor.configuration.host.replace(
         'localhost',
-        params['company'] + '.logicmonitor.com'
+        params['account'] + '.logicmonitor.com'
     )
     logicmonitor.configuration.api_key['id'] = params['access_id']
     logicmonitor.configuration.api_key['Authorization'] = params['access_key']
@@ -507,21 +514,21 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(required=True, default=None, choices=STATE),
-            company=dict(required=True, default=None),
+            account=dict(required=True, default=None),
             access_id=dict(required=True, default=None),
             access_key=dict(required=True, default=None, no_log=True),
 
             description=dict(required=False, default=''),
             disable_alerting=dict(
                 required=False,
-                default='true',
+                default='false',
                 type='bool',
                 choices=BOOLEANS
             ),
             display_name=dict(required=False, default=None),
             groups=dict(required=False, default=[], type='list'),
             name=dict(required=False, default=None),
-            preferred_collector_id=dict(required=False, default=None),
+            preferred_collector_id=dict(required=True, default=None),
             properties=dict(required=False, default={}, type='dict')
         ),
         supports_check_mode=True

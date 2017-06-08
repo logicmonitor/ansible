@@ -35,51 +35,38 @@ success:
 
 DOCUMENTATION = '''
 ---
-module: logicmonitor_devicegroup
-short_description: Manage your LogicMonitor account through Ansible Playbooks
+module: logicmonitor_device_group
+short_description: Manage LogicMonitor device groups
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.
   - This module manages device groups within your LogicMonitor account.
-version_added: '2.2'
+version_added: '2.4'
 author: [Jeff Wozniak (@woz5999)]
 notes:
   - You must have an existing LogicMonitor account for this module to function.
+  - The specified token Access Id and Access Key must have sufficient permission to perform the requested actions
+  - This module is recommended for use from a single host using local_action or delegate_to
 requirements: ['An existing LogicMonitor account', 'Linux']
 options:
   state:
     description:
+      - Whether to ensure that the resource is present or absent
     required: true
     default: null
     choices: ['present', 'absent']
-  company:
+  account:
     description:
-      - The LogicMonitor account company name. If you would log in to your account at 'superheroes.logicmonitor.com' you would use 'superheroes.'
+      - LogicMonitor account name
     required: true
     default: null
   access_id:
     description:
-      - Your API Token Access ID
+      - LogicMonitor API Token Access ID
     required: true
     default: null
   access_key:
     description:
-        - Your API Token Access Key
-    required: true
-    default: null
-  description:
-    description:
-      - The long text description of the device group in your LogicMonitor account.
-    required: false
-    default: ''
-  properties:
-    description:
-      - A dictionary of properties to set on the device group.
-    required: false
-    default: {}
-  full_path:
-    description:
-      - The full_path of the device group object you would like to manage.
-      - Recommend running on a single Ansible host.
+      - LogicMonitor API Token Access Key
     required: true
     default: null
   applies_to:
@@ -88,12 +75,30 @@ options:
       - If set, this will create a dynamic device group
     required: false
     default: null
+  description:
+    description:
+      - The description of the device group
+    required: false
+    default: ''
   disable_alerting:
     description:
-      - A boolean flag to turn alerting on or off for the device group.
+      - Indicates whether alerting is disabled (true) or enabled (false) for this device group
     required: false
     default: false
-    choices: [true, false]
+    type: bool
+  full_path:
+    description:
+      - The full path of the device group object you would like to manage
+      - For example: /Production/Web/Databases
+      - If the parent device groups specified in the path don't exist, they will be created
+    required: true
+    default: null
+  properties:
+    description:
+      - A dictionary of properties associated with this device group
+    required: false
+    default: {}
+    type: dict
 ...
 '''
 
@@ -144,7 +149,7 @@ def get_client(params, module):
 
     logicmonitor.configuration.host = logicmonitor.configuration.host.replace(
         'localhost',
-        params['company'] + '.logicmonitor.com'
+        params['account'] + '.logicmonitor.com'
     )
     logicmonitor.configuration.api_key['id'] = params['access_id']
     logicmonitor.configuration.api_key['Authorization'] = params['access_key']
@@ -412,7 +417,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(required=True, default=None, choices=STATE),
-            company=dict(required=True, default=None),
+            account=dict(required=True, default=None),
             access_id=dict(required=True, default=None),
             access_key=dict(required=True, default=None, no_log=True),
 
