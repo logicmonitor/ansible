@@ -202,7 +202,7 @@ def get_object(client, params, module):
             custom_properties=format_custom_properties(params['properties']),
             description=params['description'],
             disable_alerting=bool(params['disable_alerting']),
-            full_path=params['full_path'],
+            full_path=params['full_path'].lstrip('/'),
             group_type='Normal',
         )
 
@@ -232,7 +232,6 @@ def compare_objects(group_1, group_2):
 
     dict_1 = group_1.to_dict()
     dict_2 = group_2.to_dict()
-
     for k in dict_1:
         if k in exclude_keys:
             continue
@@ -399,7 +398,7 @@ def ensure_present(params, module):
     found_obj = find_obj(client, obj.full_path, module)
     if found_obj is None:
         if not module.check_mode:
-            add_obj(client, obj, module)
+            create_device_group(client, obj, module)
         module.exit_json(changed=True)
     if not compare_obj(obj, found_obj):
         if not module.check_mode:
@@ -425,13 +424,6 @@ def ensure_absent(params, module):
 def selector(module):
     '''Figure out which object and which actions
     to take given the right parameters'''
-
-    # Make sure required parameter collector is specified
-    if ((module.params['state'] == 'present' or
-        module.params['displayname'] is None) and
-       module.params['collector'] is None):
-        module.fail_json(
-            msg='Parameter "collector" required.')
 
     changed = False
     if module.params['state'].lower() == 'present':
@@ -465,7 +457,7 @@ def main():
                 type='bool',
                 choices=BOOLEANS
             ),
-            full_path=dict(required=False, default=None),
+            full_path=dict(required=True, default=None),
             properties=dict(required=False, default={}, type='dict')
         ),
         supports_check_mode=True
