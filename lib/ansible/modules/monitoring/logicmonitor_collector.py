@@ -50,6 +50,7 @@ options:
   state:
     description:
       - Whether to ensure that the resource is present or absent
+      - When 'absent', 'id' or 'description' must be specified
     required: true
     default: null
     choices: ['present', 'absent']
@@ -68,7 +69,7 @@ options:
       - LogicMonitor API Token Access Key
     required: true
     default: null
-  bakckup_collector_id:
+  backup_collector_id:
     description:
       - The Id of the failover Collector configured for this Collector
     required: false
@@ -105,11 +106,6 @@ options:
     required: false
     default: 1
     type: int
-   hostname:
-    description:
-      - The Collector's hostname
-    required: false
-    default: null
    id:
     description:
       - The Id of an existing Collector provision
