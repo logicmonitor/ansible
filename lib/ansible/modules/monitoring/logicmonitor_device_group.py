@@ -89,7 +89,7 @@ options:
   full_path:
     description:
       - The full path of the device group object you would like to manage
-      - For example: /Production/Web/Databases
+      - 'For example: /Production/Web/Databases'
       - If the parent device groups specified in the path don't exist, they will be created
     required: true
     default: null
@@ -98,7 +98,6 @@ options:
       - A dictionary of properties associated with this device group
     required: false
     default: {}
-    type: dict
 ...
 '''
 

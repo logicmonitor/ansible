@@ -49,7 +49,7 @@ requirements: ['An existing LogicMonitor account', 'Linux']
 options:
   state:
     description:
-      -       - Whether to ensure that the resource is present or absent
+      - Whether to ensure that the resource is present or absent
     required: true
     default: null
     choices: ['present', 'absent']
@@ -99,7 +99,6 @@ options:
         - A list of groups that the device should be a member of
     required: false
     default: []
-    type: list
   disable_alerting:
     description:
       - Indicates whether alerting is disabled (true) or enabled (false) for this device

@@ -106,7 +106,7 @@ options:
     required: false
     default: 1
     type: int
-   id:
+  id:
     description:
       - The Id of an existing Collector provision
       - The specified Collector Id must already exist in order to use this option
