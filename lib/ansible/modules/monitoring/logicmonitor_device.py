@@ -68,10 +68,6 @@ options:
       - LogicMonitor API Token Access Key
     required: true
     default: null
-
-
-
-
   preferred_collector_id:
     description:
       - The Id of the preferred collector assigned to monitor the device
@@ -194,9 +190,9 @@ def get_obj(client, params, module):
             unknown_device_groups = []
 
             for group in params['groups']:
-                device_group_id = find_device_group(client, group, module)
-                if device_group_id is not None:
-                    device_group_ids.append(device_group_id)
+                device_group = find_device_group(client, group, module)
+                if device_group is not None:
+                    device_group_ids.append(str(device_group.id))
                 else:
                     all_found = False
                     unknown_device_groups.append(group)
