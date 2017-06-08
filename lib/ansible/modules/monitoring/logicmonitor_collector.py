@@ -134,6 +134,12 @@ options:
 ...
 '''
 
+EXAMPLES = '''
+# creating a collector
+---
+- hosts: hosts
+  vars:
+    account: myaccount
     access_id: access_id
     access_key: access_key
   tasks:
@@ -697,7 +703,6 @@ def main():
                 choices=BOOLEANS
             ),
             escalation_chain_id=dict(required=False, default=1, type='int'),
-            hostname=dict(equired=False, default=None),
             id=dict(required=False, default=None, type='int'),
             resend_interval=dict(required=False, default=15, type='int'),
             suppress_alert_clear=dict(
