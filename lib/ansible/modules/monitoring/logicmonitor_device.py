@@ -106,8 +106,49 @@ options:
     required: false
     default: false
     type: bool
-
 ...
+'''
+
+EXAMPLES = '''
+# creating a device
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create device
+    logicmonitor_collector_group:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      description: Device added by Ansible
+      name: server1.test.net
+      display_name: server1
+      groups: /AnsibleDevices/WebServers,/Production
+      preferred_collector_id: 1
+      properties:
+        snmp.community: commstring
+        environment: production
+
+# removing a device
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create device
+    logicmonitor_collector_group:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: absent
+      name: server1.test.net
+      preferred_collector_id: 1
 '''
 
 
