@@ -112,13 +112,14 @@ EXAMPLES = '''
     access_id: access_id
     access_key: access_key
   tasks:
-  - name: Create collector group
+  - name: Create device group
     logicmonitor_collector_group:
       account: '{{ account }}'
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
       state: present
       description: My device group created by Ansible
+      disable_alerting: no
       full_path: /AnsibleDevices/WebServers
       properties:
         snmp.community: commstring
@@ -134,7 +135,7 @@ EXAMPLES = '''
     access_id: access_id
     access_key: access_key
   tasks:
-  - name: Create collector group
+  - name: Remove device group
     logicmonitor_collector_group:
       account: '{{ account }}'
       access_id: '{{ access_id }}'
