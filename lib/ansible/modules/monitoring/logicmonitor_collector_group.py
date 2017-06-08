@@ -84,6 +84,43 @@ options:
 
 EXAMPLES = '''
 ---
+# creating a collector group
+---
+- hosts: hosts
+  remote_user: '{{ username }}'
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create collector group
+    logicmonitor_collector_group:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      description: My collector group created by Ansible
+      name: AnsibleCollectors
+    delegate_to: localhost
+
+# removing a collector group
+---
+- hosts: hosts
+  remote_user: '{{ username }}'
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create collector group
+    logicmonitor_collector_group:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: absent
+      description: My collector group created by Ansible
+      name: AnsibleCollectors
+    delegate_to: localhost
 ...
 '''
 
