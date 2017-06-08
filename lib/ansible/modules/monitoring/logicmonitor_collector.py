@@ -134,6 +134,83 @@ options:
 ...
 '''
 
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create and install collector
+    logicmonitor_collector:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      backup_collector_id: 15
+      collector_group: AnsibleCollectors
+      collector_size: large
+      description: My collector created by Ansible
+      enable_fail_back: yes
+      escalation_chain_id: 1
+      resend_interval: 60
+      suppress_alert_clear: no
+      use_ea: yes
+
+# installing and/or updating an existing collector
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create and install collector
+    logicmonitor_collector:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      id: 16
+      backup_collector_id: 15
+      collector_group: AnsibleCollectors
+      collector_size: large
+      description: My collector created by Ansible
+      enable_fail_back: yes
+      escalation_chain_id: 1
+      resend_interval: 60
+      suppress_alert_clear: no
+      use_ea: yes
+
+# removing a collector by id
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create and install collector
+    logicmonitor_collector:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: absent
+      id: 15
+
+# removing a collector by description
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Create and install collector
+    logicmonitor_collector:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: absent
+      description: My collector created by Ansible
+'''
+
 import logicmonitor
 from logicmonitor.rest import ApiException
 import os
