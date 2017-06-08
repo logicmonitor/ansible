@@ -212,13 +212,13 @@ def get_obj(client, params, module):
             scan_config_id=0
         )
 
-        if 'name' in params:
+        if 'name' in params and params['name']:
             obj.name = params['name']
         else:
             # if name not specified, default to fqdn
             obj.name = socket.getfqdn()
 
-        if 'display_name' in params:
+        if 'display_name' in params and params['display_name']:
             obj.display_name = params['display_name']
         else:
             # if display name not set, default to host name
@@ -353,9 +353,9 @@ def find_device_group(client, full_path, module):
 
 
 def find_obj(client, params, module):
-    if 'display_name' in params:
+    if 'display_name' in params and params['display_name']:
         module.debug('finding device ' + str(params['display_name']))
-    elif 'name' in params:
+    elif 'name' in params and params['name']:
         module.debug('finding device ' + str(params['name']))
 
     devices = None
@@ -373,12 +373,12 @@ def find_obj(client, params, module):
         module.fail_json(msg=err, changed=False, failed=True)
 
     # display name is globally unique, so prefer that match
-    if 'display_name' in params:
+    if 'display_name' in params and params['display_name']:
         for item in devices.data.items:
             if item.display_name == params['display_name']:
                 return item
 
-    if 'name' not in params:
+    if 'name' not in params and params['name']:
         return None
 
     for item in devices.data.items:

@@ -294,17 +294,17 @@ def get_obj(client, params, module):
         )
         module.fail_json(msg=err, changed=False, failed=True)
 
-    if 'backup_collector_id' in params:
+    if 'backup_collector_id' in params and params['backup_collector_id']:
         obj.backup_agent_id = params['backup_collector_id']
-    if 'description' in params:
+    if 'description' in params and params['description']:
         obj.description = params['description']
     else:
         obj.description = socket.getfqdn()
-    if 'id' in params:
+    if 'id' in params and params['id']:
         obj.id = params['id']
-    if 'resend_interval' in params:
+    if 'resend_interval' in params and params['resend_interval']:
         obj.resend_ival = params['resend_interval']
-    if 'suppress_alert_clear' in params:
+    if 'suppress_alert_clear' in params and params['suppress_alert_clear']:
         obj.suppress_alert_clear = params['suppress_alert_clear']
 
     return obj
@@ -406,7 +406,7 @@ def find_collector_group(client, collector_group_name, module):
 
 
 def find_obj(client, params, module):
-    if 'id' in params and 'present' != params['state']:
+    if 'id' in params and params['id'] and 'present' != params['state']:
         return find_collector_by_id(client, params['id'], module)
     else:
         return find_collector(client, params, module)
@@ -436,7 +436,7 @@ def find_collector_by_id(client, id, module):
 
 
 def find_collector(client, params, module):
-    if 'description' not in params:
+    if 'description' not in params or not params['description']:
         return None
 
     module.debug('finding collector ' + str(params['description']))
@@ -455,7 +455,7 @@ def find_collector(client, params, module):
         )
         module.fail_json(msg=err, changed=False, failed=True)
 
-    if 'description' in params:
+    if 'description' in params and params['description']:
         for item in collectors.data.items:
             if item.description == params['description']:
                 return item
@@ -605,7 +605,7 @@ def ensure_present(params, module):
     found_obj = find_obj(client, params, module)
     if found_obj is None:
         if not module.check_mode:
-            if 'id' in params:
+            if 'id' in params and params['id']:
                 err = (
                     'The specified collector does not exist and collectors ' +
                     'cannot be created with a specific id.'

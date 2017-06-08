@@ -207,7 +207,7 @@ def get_object(client, params, module):
             group_type='Normal',
         )
 
-        if 'applies_to' in params:
+        if 'applies_to' in params and params['applies_to']:
             obj.applies_to = params['applies_to']
         return obj
 
