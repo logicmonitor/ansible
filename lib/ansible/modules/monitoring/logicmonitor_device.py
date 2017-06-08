@@ -506,14 +506,12 @@ def selector(module):
 
 
 def main():
-    STATE = [
-        'absent,'
-        'present'
-    ]
-
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(required=True, default=None, choices=STATE),
+            state=dict(required=True, default=None, choices=[
+                'absent',
+                'present'
+            ]),
             account=dict(required=True, default=None),
             access_id=dict(required=True, default=None),
             access_key=dict(required=True, default=None, no_log=True),
