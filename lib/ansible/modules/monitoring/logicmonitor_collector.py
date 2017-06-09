@@ -113,19 +113,19 @@ options:
     required: false
     default: null
     type: int
-   resend_interval:
+  resend_interval:
     description:
       - The interval, in minutes, after which alert notifications for the Collector will be resent
     required: false
     default: 15
     type: int
-   suppress_alert_clear:
+  suppress_alert_clear:
     description:
       - Whether alert clear notifications are suppressed for the Collector
     required: false
     default: False
     type: bool
-   us_ea:
+  us_ea:
     description:
       - If true, the latest EA Collector version will be used
     required: false

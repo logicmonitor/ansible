@@ -93,7 +93,6 @@ options:
       - A dictionary of properties associated with this device group
     required: false
     default: {}
-    type: dict
   groups:
     description:
         - A list of groups that the device should be a member of

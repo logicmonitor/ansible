@@ -35,7 +35,7 @@ success:
 
 DOCUMENTATION = '''
 ---
-module: logicmonitor_device_group
+module: logicmonitor_collector_group
 short_description: Manage LogicMonitor collector groups
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.
