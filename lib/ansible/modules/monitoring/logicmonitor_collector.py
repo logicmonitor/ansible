@@ -74,7 +74,6 @@ options:
       - The Id of the failover Collector configured for this Collector
     required: false
     default: null
-    type: int
   collector_group:
     description:
       - The Id of the group the Collector is in
@@ -105,20 +104,17 @@ options:
       - The Id of the escalation chain associated with this Collector
     required: false
     default: 1
-    type: int
   id:
     description:
       - The Id of an existing Collector provision
       - The specified Collector Id must already exist in order to use this option
     required: false
     default: null
-    type: int
   resend_interval:
     description:
       - The interval, in minutes, after which alert notifications for the Collector will be resent
     required: false
     default: 15
-    type: int
   suppress_alert_clear:
     description:
       - Whether alert clear notifications are suppressed for the Collector
