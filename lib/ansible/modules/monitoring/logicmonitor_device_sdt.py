@@ -68,6 +68,34 @@ options:
       - LogicMonitor API Token Access Key
     required: true
     default: null
+  comment:
+    description:
+      - The comment associated with the SDT
+    required: false
+    default: ''
+  device_display_name:
+    description:
+      - The name of the device that this SDT will be associated with
+      - device_id or device_display_name must be specified
+    required: false
+    default: null
+  device_id:
+    description:
+      - The id of the device that the SDT will be associated with
+      - device_id or device_display_name must be specified
+    required: false
+    default: null
+  duration:
+    description:
+      - The duration of the SDT in minutes
+    required: false
+    default: 15
+  start_time:
+    description:
+      - The time the SDT will start
+      - yyyy-mm-dd HH:MM
+    required: false
+    default: now
 ...
 '''
 
