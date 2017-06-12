@@ -317,9 +317,7 @@ def update_obj(client, collector_group, module):
     return resp
 
 
-def ensure_present(params, module):
-    client = get_client(params, module)
-
+def ensure_present(client, params, module):
     obj = get_object(client, params, module)
 
     found_obj = find_obj(client, obj.name, module)
@@ -336,9 +334,7 @@ def ensure_present(params, module):
     module.exit_json(changed=False)
 
 
-def ensure_absent(params, module):
-    client = get_client(params, module)
-
+def ensure_absent(client, params, module):
     obj = find_obj(client, params['name'], module)
     if obj is None:
         module.exit_json(changed=False)
@@ -357,11 +353,13 @@ def selector(module):
         module.fail_json(
             msg='Parameter "name" required.')
 
+    client = get_client(module.params, module)
+
     changed = False
     if module.params['state'].lower() == 'present':
-        changed = ensure_present(module.params, module)
+        changed = ensure_present(client, module.params, module)
     elif module.params['state'].lower() == 'absent':
-        changed = ensure_absent(module.params, module)
+        changed = ensure_absent(client, module.params, module)
     else:
         errmsg = ('Error: Unexpected state \'' + module.params['state'] +
                   '\' was specified.')

@@ -492,9 +492,7 @@ def format_custom_properties(properties):
     return ret
 
 
-def ensure_present(params, module):
-    client = get_client(params, module)
-
+def ensure_present(client, params, module):
     obj = get_obj(client, params, module)
 
     found_obj = find_obj(client, params, module)
@@ -511,9 +509,7 @@ def ensure_present(params, module):
     module.exit_json(changed=False)
 
 
-def ensure_absent(params, module):
-    client = get_client(params, module)
-
+def ensure_absent(client, params, module):
     obj = find_obj(client, params, module)
     if obj is None:
         module.exit_json(changed=False)
@@ -527,11 +523,12 @@ def selector(module):
     '''Figure out which object and which actions
     to take given the right parameters'''
 
+    client = get_client(module.params, module)
+
     changed = False
     if module.params['state'].lower() == 'present':
-        changed = ensure_present(module.params, module)
+        changed = ensure_present(client, module.params, module)
     elif module.params['state'].lower() == 'absent':
-        changed = ensure_absent(module.params, module)
     else:
         errmsg = ('Error: Unexpected state \'' + module.params['state'] +
                   '\' was specified.')
