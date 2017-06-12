@@ -104,6 +104,11 @@ EXAMPLES = '''
 '''
 
 
+ONE_TIME_SDT = 1
+DAILY_SDT = 4
+WEEKLY_SDT = 2
+MONTHLY_SDT = 3
+
 import datetime
 import logicmonitor
 from logicmonitor.rest import ApiException
@@ -162,7 +167,7 @@ def get_obj(client, params, module):
             comment=params['comment'],
             end_date_time=params['end_date_time'],
             sdt_type=params['sdt_type'],
-            start_date_time=params['start_time_epoch'],
+            start_date_time=params['start_time'],
             type='DeviceSDT'
         )
 
@@ -298,7 +303,7 @@ def find_obj(client, params, module):
                 match = True
         if (
             match and
-            int(item['startDateTime']) == int(params['start_time_epoch']) and
+            int(item['startDateTime']) == int(params['start_time']) and
             int(item['endDateTime']) == int(params['end_date_time'])
         ):
             return item
@@ -411,18 +416,65 @@ def ensure_absent(params, module):
         module.exit_json(changed=True)
 
 
-def parse_sdt_type(sdt_type):
-    # convert sdt type to int
-    if sdt_type == 'one-time':
-        return 1
-    elif sdt_type == 'daily':
-        return 4
-    elif sdt_type == 'weekly':
-        return 2
-    elif sdt_type == 'monthly':
-        return 3
+def convert_datetime_to_epoch(date, module):
+    try:
+        return (date - datetime.datetime(1970, 1, 1)).total_seconds() * 1000
+    except Exception as e:
+        err = 'Error converting date to epoch: ' + str(e) + '\n'
+        module.fail_json(msg=err, changed=False, failed=True)
+
+
+def parse_time(time, module):
+    # parse start time format
+    try:
+        return datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
+    except Exception as e:
+        err = 'Error parsing time: ' + str(e) + '\n'
+        module.fail_json(msg=err, changed=False, failed=True)
+
+
+def parse_sdt_type(module):
+    # repeating SDT currently not supported. default to one-time
+    return ONE_TIME_SDT
+    # sdt_type = module.params['sdt_type']
+    # # convert sdt type to int
+    # if sdt_type == 'one-time':
+    #     return ONE_TIME_SDT
+    # elif sdt_type == 'daily':
+    #     return DAILY_SDT
+    # elif sdt_type == 'weekly':
+    #     return WEEKLY_SDT
+    # elif sdt_type == 'monthly':
+    #     return MONTHLY_SDT
+    # else:
+    #     err = 'Unknown SDT type: ' + str(module.params['sdt_type'])
+    #     module.fail_json(msg=err, changed=False, failed=True)
+
+
+def parse_one_time_sdt(module):
+    # default to start time of now
+    if not module.params['start_time']:
+        # since we're doing this calculation, generate epoch and don't convert
+        module.params['start_time'] = int(time.time()) * 1000
     else:
-        return -1
+        # parse start_time string to datetime
+        module.params['start_time'] = parse_time(
+            module.params['start_time'],
+            module
+        )
+        # convert start_time to epoch
+        module.params['start_time'] = (
+            convert_datetime_to_epoch(module.params['start_time'], module)
+        )
+
+    # calculate end time from duration for one-time sdt
+    if module.params['sdt_type'] == ONE_TIME_SDT:
+        module.params['end_date_time'] = calculate_end_time(
+            module.params['start_time'],
+            module.params['duration'],
+            module
+        )
+    return module.params
 
 
 def parse_arguments(module):
@@ -441,27 +493,11 @@ def parse_arguments(module):
         module.fail_json(msg=err, changed=False, failed=True)
 
     # translate sdt type string to int
-    sdt_type_int = parse_sdt_type(module.params['sdt_type'])
-    if sdt_type_int >= 1:
-        module.params['sdt_type'] = sdt_type_int
-    else:
-        err = 'Unknown SDT type: ' + str(module.params['sdt_type'])
-        module.fail_json(msg=err, changed=False, failed=True)
+    module.params['sdt_type'] = parse_sdt_type(module)
 
-    # default to start time of now
-    if not module.params['start_time_epoch']:
-        module.params['start_time_epoch'] = int(time.time()) * 1000
-
-    if not validate_epoch(module.params['start_time_epoch']):
-        err = 'Invalid epoch ' + str(module.params['start_time_epoch'])
-        module.fail_json(msg=err, changed=False, failed=True)
-
-    # calculate end time from duration
-    module.params['end_date_time'] = calculate_end_time(
-        module.params['start_time_epoch'],
-        module.params['duration'],
-        module
-    )
+    # parse date arguments
+    if module.params['sdt_type'] == ONE_TIME_SDT:
+        module.params = parse_one_time_sdt(module)
     return module.params
 
 
@@ -498,13 +534,7 @@ def main():
             device_display_name=dict(required=False, default=None),
             device_id=dict(required=False, default=None),
             duration=dict(required=False, default=15),
-            sdt_type=dict(required=False, default='one-time', choices=[
-                'one-time',
-                'daily',
-                'weekly',
-                'monthly'
-            ]),
-            start_time_epoch=dict(required=False, default=None)
+            start_time=dict(required=False, default=None)
         ),
         supports_check_mode=True
     )
