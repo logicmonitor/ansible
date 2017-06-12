@@ -606,14 +606,13 @@ def ensure_present(params, module):
 
     found_obj = find_obj(client, params, module)
     if found_obj is None:
+        if 'id' in params and params['id']:
+            err = (
+                'The specified collector does not exist and collectors ' +
+                'cannot be created with a specific id.'
+            )
+            module.fail_json(msg=err, changed=False, failed=True)
         if not module.check_mode:
-            if 'id' in params and params['id']:
-                err = (
-                    'The specified collector does not exist and collectors ' +
-                    'cannot be created with a specific id.'
-                )
-                module.fail_json(msg=err, changed=False, failed=True)
-
             resp = add_obj(client, obj, module)
             # grab the id from the created object
             obj.id = resp.id
