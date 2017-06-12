@@ -92,7 +92,7 @@ options:
     default: 15
   start_time:
     description:
-      - The time the SDT will start
+      - The UTC time when the SDT will start
       - yyyy-mm-dd HH:MM
     required: false
     default: now
@@ -465,7 +465,9 @@ def ensure_absent(client, params, module):
 
 def convert_datetime_to_epoch(date, module):
     try:
-        return (date - datetime.datetime(1970, 1, 1)).total_seconds() * 1000
+        return int(
+            (date - datetime.datetime(1970, 1, 1)).total_seconds() * 1000
+        )
     except Exception as e:
         err = 'Error converting date to epoch: ' + str(e) + '\n'
         module.fail_json(msg=err, changed=False, failed=True)
