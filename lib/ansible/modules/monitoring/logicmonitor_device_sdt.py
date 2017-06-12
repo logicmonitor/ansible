@@ -76,13 +76,13 @@ options:
   device_display_name:
     description:
       - The name of the device that this SDT will be associated with
-      - device_id or device_display_name must be specified
+      - If both device_id and device_display_name are blank, we will attempt to perform a best-guess lookup based on the current host's FQDN. This is not guaranteed to be reliable and will only be used as a last resort.
     required: false
     default: null
   device_id:
     description:
       - The id of the device that the SDT will be associated with
-      - device_id or device_display_name must be specified
+      - If both device_id and device_display_name are blank, we will attempt to perform a best-guess lookup based on the current host's FQDN. This is not guaranteed to be reliable and will only be used as a last resort.
     required: false
     default: null
   duration:
@@ -162,9 +162,10 @@ MONTHLY_SDT = 3
 import datetime
 import logicmonitor
 from logicmonitor.rest import ApiException
+import re
+import socket
 import time
 import types
-import re
 
 
 HAS_LIB_JSON = True
@@ -523,20 +524,59 @@ def parse_one_time_sdt(module):
     return module.params
 
 
-def parse_arguments(module):
-    # validate device id and display name inputs. specify one and only one
-    if (
-        (
-            not module.params['device_id'] and
-            not module.params['device_display_name']
-        ) or
-        (
-            module.params['device_id'] and
-            module.params['device_display_name']
-        )
-    ):
-        err = "You must specify either 'device_id' or 'device_display_name'"
+def find_device(client, hostname, module):
+    devices = None
+    try:
+        devices = client.get_device_list()
+    except ApiException as e:
+        err = 'Exception when calling get_device_list: ' + str(e) + '\n'
         module.fail_json(msg=err, changed=False, failed=True)
+
+    if devices.status != 200:
+        err = (
+            'Error ' + str(devices.status) +
+            ' calling get_device_list: ' + str(e) + '\n'
+        )
+        module.fail_json(msg=err, changed=False, failed=True)
+
+    for item in devices.data.items:
+        if item.name == hostname:
+            return str(item.id)
+    return None
+
+
+def parse_device(client, module):
+    # validate device id and display name inputs. may specify 0 or 1
+    if (
+        module.params['device_id'] and
+        module.params['device_display_name']
+    ):
+        err = "You may not specify both 'device_id' and 'device_display_name'"
+        module.fail_json(msg=err, changed=False, failed=True)
+
+    # if neither specified, get current hostname and lookup device id
+    if (
+        not module.params['device_id'] and
+        not module.params['device_display_name']
+    ):
+        module.params['device_id'] = find_device(
+            client,
+            # socket.getfqdn(),
+            'hostname.lm.net',
+            module
+        )
+
+    # check if this device was found
+    if not module.params['device_id']:
+        err = 'Unable to locate device ' + socket.getfqdn()
+        module.fail_json(msg=err, changed=False, failed=True)
+
+    return module.params
+
+
+def parse_arguments(client, module):
+    # parse out the target device and default to this device is none specified
+    module.params = parse_device(client, module)
 
     # translate sdt type string to int
     module.params['sdt_type'] = parse_sdt_type(module)
