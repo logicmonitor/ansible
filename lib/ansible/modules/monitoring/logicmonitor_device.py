@@ -117,7 +117,7 @@ EXAMPLES = '''
     access_key: access_key
   tasks:
   - name: Create device
-    logicmonitor_collector_group:
+    logicmonitor_device:
       account: '{{ account }}'
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
@@ -140,7 +140,7 @@ EXAMPLES = '''
     access_key: access_key
   tasks:
   - name: Create device
-    logicmonitor_collector_group:
+    logicmonitor_device:
       account: '{{ account }}'
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
@@ -529,6 +529,7 @@ def selector(module):
     if module.params['state'].lower() == 'present':
         changed = ensure_present(client, module.params, module)
     elif module.params['state'].lower() == 'absent':
+        changed = ensure_absent(client, module.params, module)
     else:
         errmsg = ('Error: Unexpected state \'' + module.params['state'] +
                   '\' was specified.')

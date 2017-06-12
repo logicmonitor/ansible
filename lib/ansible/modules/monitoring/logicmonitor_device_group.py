@@ -112,7 +112,7 @@ EXAMPLES = '''
     access_key: access_key
   tasks:
   - name: Create device group
-    logicmonitor_collector_group:
+    logicmonitor_device_group:
       account: '{{ account }}'
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
@@ -135,7 +135,7 @@ EXAMPLES = '''
     access_key: access_key
   tasks:
   - name: Remove device group
-    logicmonitor_collector_group:
+    logicmonitor_device_group:
       account: '{{ account }}'
       access_id: '{{ access_id }}'
       access_key: '{{ access_key }}'
