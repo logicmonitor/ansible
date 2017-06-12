@@ -437,7 +437,7 @@ def add_obj(client, device, module):
 
 
 def delete_obj(client, device, module):
-    module.debug('deleting device group ' + str(device.name))
+    module.debug('deleting device ' + str(device.name))
     resp = None
     try:
         resp = client.delete_device(str(device.id))
