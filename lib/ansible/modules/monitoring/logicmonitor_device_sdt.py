@@ -574,7 +574,12 @@ def parse_device(client, module):
     return module.params
 
 
-def parse_arguments(client, module):
+def selector(module):
+    '''Figure out which object and which actions
+    to take given the right parameters'''
+
+    client = get_client(module.params, module)
+
     # parse out the target device and default to this device is none specified
     module.params = parse_device(client, module)
 
@@ -585,15 +590,6 @@ def parse_arguments(client, module):
     if module.params['sdt_type'] == ONE_TIME_SDT:
         module.params = parse_one_time_sdt(module)
     return module.params
-
-
-def selector(module):
-    '''Figure out which object and which actions
-    to take given the right parameters'''
-
-    client = get_client(module.params, module)
-
-    module.params = parse_arguments(client, module)
 
     changed = False
     if module.params['state'].lower() == 'present':
