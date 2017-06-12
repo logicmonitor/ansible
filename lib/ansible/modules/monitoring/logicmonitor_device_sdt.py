@@ -581,7 +581,6 @@ def selector(module):
     to take given the right parameters'''
 
     client = get_client(module.params, module)
-
     # parse out the target device and default to this device is none specified
     module.params = parse_device(client, module)
 
@@ -591,7 +590,6 @@ def selector(module):
     # parse date arguments
     if module.params['sdt_type'] == ONE_TIME_SDT:
         module.params = parse_one_time_sdt(module)
-    return module.params
 
     changed = False
     if module.params['state'].lower() == 'present':
