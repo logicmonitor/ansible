@@ -100,7 +100,57 @@ options:
 '''
 
 EXAMPLES = '''
-# TODO
+# scheduling immediate downtime for a device via device id
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Schedule device downtime
+    logicmonitor_device_sdt:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      device_id: 6
+
+# scheduling future downtime for a device via device display name
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Schedule device downtime
+    logicmonitor_device_sdt:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: present
+      device_display_name: server1
+      start_time: 2017-07-18 13:45
+      duration: 60
+
+# removing scheduled downtime from a device
+---
+- hosts: hosts
+  vars:
+    account: myaccount
+    access_id: access_id
+    access_key: access_key
+  tasks:
+  - name: Remove device downtime
+    logicmonitor_device_sdt:
+      account: '{{ account }}'
+      access_id: '{{ access_id }}'
+      access_key: '{{ access_key }}'
+      state: absent
+      device_display_name: server1
+      start_time: 2017-07-18 13:45
+      duration: 60
 '''
 
 
