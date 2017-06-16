@@ -361,11 +361,6 @@ def add_obj(client, sdt, module):
         module.fail_json(msg=err, changed=False, failed=True)
 
     if resp.status != 200:
-        if resp.status == 600:
-            # TODO CHECK THIS RETURN CODE
-            # Status 600: The record already exists
-            return sdt
-
         err = (
             'Status ' + str(resp.status) + ' calling add_sdt\n' +
             str(resp.errmsg)
