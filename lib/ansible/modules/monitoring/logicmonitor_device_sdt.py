@@ -36,7 +36,7 @@ success:
 DOCUMENTATION = '''
 ---
 module: logicmonitor_device_sdt
-short_description: Manage LogicMonitor Scheduled Downtime
+short_description: Manage LogicMonitor Device Scheduled Downtime
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.
   - This module manages scheduled downtime within your LogicMonitor account.
@@ -75,14 +75,14 @@ options:
     default: ''
   device_display_name:
     description:
-      - The name of the device that this SDT will be associated with
-      - If both device_id and device_display_name are blank, we will attempt to perform a best-guess lookup based on the current host's FQDN. This is not guaranteed to be reliable and will only be used as a last resort.
+      - The name of the device that this SDT will be applied to
+      - If both device_id and device_display_name are undefined, we will attempt to perform a best-guess lookup based on the current host's FQDN. This is not guaranteed to be reliable and will only be used as a last resort.
     required: false
     default: null
   device_id:
     description:
-      - The id of the device that the SDT will be associated with
-      - If both device_id and device_display_name are blank, we will attempt to perform a best-guess lookup based on the current host's FQDN. This is not guaranteed to be reliable and will only be used as a last resort.
+      - The id of the device that the SDT will be applied to
+      - If both device_id and device_display_name are undefined, we will attempt to perform a best-guess lookup based on the current host's FQDN. This is not guaranteed to be reliable and will only be used as a last resort.
     required: false
     default: null
   duration:
@@ -159,7 +159,7 @@ DAILY_SDT = 4
 WEEKLY_SDT = 2
 MONTHLY_SDT = 3
 
-DEVICE_SDT = 'DeviceSDT'
+THIS_SDT = 'DeviceSDT'
 
 import datetime
 import logicmonitor
@@ -298,19 +298,6 @@ def upper_repl(match):
     return match.group(1).upper()
 
 
-def fix_pagination_object(item, module):
-    item = item.replace('u\'', '\'')
-    item = item.replace('\'', '"')
-    item = item.replace('True', 'true')
-    item = item.replace('False', 'false')
-    try:
-        return json.loads(item)
-    except Exception as e:
-        err = 'Exception unmarshaling SDT list result: ' + str(e) + '\n'
-        module.fail_json(msg=err, changed=False, failed=True)
-    return item
-
-
 def find_obj(client, params, module):
     sdts = None
     try:
@@ -328,7 +315,7 @@ def find_obj(client, params, module):
 
     for item in sdts.data.items:
         # skip SDT types outside the scope of this module
-        if item.type != DEVICE_SDT:
+        if item.type != THIS_SDT:
             continue
 
         match = False
