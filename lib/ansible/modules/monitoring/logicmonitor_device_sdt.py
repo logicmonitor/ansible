@@ -327,8 +327,7 @@ def find_obj(client, params, module):
         module.fail_json(msg=err, changed=False, failed=True)
 
     for item in sdts.data.items:
-        # normalize the result into something actually useful
-        item = fix_pagination_object(item, module)
+        # skip SDT types outside the scope of this module
         if item.type != DEVICE_SDT:
             continue
 
