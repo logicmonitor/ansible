@@ -159,10 +159,11 @@ DAILY_SDT = 4
 WEEKLY_SDT = 2
 MONTHLY_SDT = 3
 
+DEVICE_SDT = 'DeviceSDT'
+
 import datetime
 import logicmonitor
 from logicmonitor.rest import ApiException
-import re
 import socket
 import time
 import types
@@ -214,7 +215,7 @@ def get_client(params, module):
 
 def get_obj(client, params, module):
     try:
-        obj = logicmonitor.RestSDTBase(
+        obj = logicmonitor.DeviceSDT(
             comment=params['comment'],
             end_date_time=params['end_date_time'],
             sdt_type=params['sdt_type'],
@@ -297,20 +298,6 @@ def upper_repl(match):
     return match.group(1).upper()
 
 
-def fix_polymorphic_object(src):
-    # hacky shit to deal with polymorphic resource
-    obj = {}
-    for attr, value in src.__dict__.iteritems():
-        if attr == 'swagger_types' or attr == 'attribute_map':
-            continue
-        if getattr(src, attr):
-            # add the attr to obj and strip leading _
-            k = re.sub('^_', '', attr)
-            k = re.sub('_(\w)', upper_repl, k)
-            obj[k] = getattr(src, attr)
-    return obj
-
-
 def fix_pagination_object(item, module):
     item = item.replace('u\'', '\'')
     item = item.replace('\'', '"')
@@ -342,20 +329,22 @@ def find_obj(client, params, module):
     for item in sdts.data.items:
         # normalize the result into something actually useful
         item = fix_pagination_object(item, module)
+        if item.type != DEVICE_SDT:
+            continue
 
         match = False
         # display id is globally unique, so prefer that match
         if 'device_id' in params and params['device_id']:
-            if int(item['deviceId']) == int(params['device_id']):
+            if int(item.device_id) == int(params['device_id']):
                 match = True
 
         if 'device_display_name' in params and params['device_display_name']:
-            if item['deviceDisplayName'] == params['device_display_name']:
+            if item.device_display_name == params['device_display_name']:
                 match = True
         if (
             match and
-            int(item['startDateTime']) == int(params['start_time']) and
-            int(item['endDateTime']) == int(params['end_date_time'])
+            int(item.start_date_time) == int(params['start_time']) and
+            int(item.end_date_time) == int(params['end_date_time'])
         ):
             return item
 
@@ -367,8 +356,6 @@ def add_obj(client, sdt, module):
 
     resp = None
     try:
-        # hacky garbage. can remove this when objects are handled better
-        sdt = fix_polymorphic_object(sdt)
         resp = client.add_sdt(sdt)
     except ApiException as e:
         err = 'Exception when calling add_sdt: ' + str(e) + '\n'
@@ -392,8 +379,7 @@ def delete_obj(client, sdt, module):
     module.debug('deleting sdt')
     resp = None
     try:
-        # hacky garbage. should be sdt.id assuming sdt was an object
-        resp = client.delete_sdt_by_id(str(sdt['id']))
+        resp = client.delete_sdt_by_id(str(sdt.id))
     except ApiException as e:
         err = (
             'Exception when calling delete_sdt: ' + str(e) +
@@ -474,7 +460,7 @@ def convert_datetime_to_epoch(date, module):
 
 
 def parse_time(time, module):
-    # parse start time format
+    # parse start time format in local time
     try:
         return datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
     except Exception as e:
