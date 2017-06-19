@@ -52,6 +52,30 @@ def wait_for_task(task):
             time.sleep(15)
 
 
+def find_obj(content, vimtype, name, first=True):
+    container = content.viewManager.CreateContainerView(container=content.rootFolder, recursive=True, type=vimtype)
+    obj_list = container.view
+    container.Destroy()
+
+    # Backward compatible with former get_obj() function
+    if name is None:
+        if obj_list:
+            return obj_list[0]
+        return None
+
+    # Select the first match
+    if first is True:
+        for obj in obj_list:
+            if obj.name == name:
+                return obj
+
+        # If no object found, return None
+        return None
+
+    # Return all matching objects if needed
+    return [obj for obj in obj_list if obj.name == name]
+
+
 def find_dvspg_by_name(dv_switch, portgroup_name):
 
     portgroups = dv_switch.portgroup
@@ -238,13 +262,19 @@ def gather_vm_facts(content, vm):
         if not hasattr(entry, 'macAddress'):
             continue
 
+        if entry.macAddress:
+            mac_addr = entry.macAddress
+            mac_addr_dash = mac_addr.replace(':', '-')
+        else:
+            mac_addr = mac_addr_dash = None
+
         factname = 'hw_eth' + str(ethernet_idx)
         facts[factname] = {
             'addresstype': entry.addressType,
             'label': entry.deviceInfo.label,
-            'macaddress': entry.macAddress,
+            'macaddress': mac_addr,
             'ipaddresses': net_dict.get(entry.macAddress, None),
-            'macaddress_dash': entry.macAddress.replace(':', '-'),
+            'macaddress_dash': mac_addr_dash,
             'summary': entry.deviceInfo.summary,
         }
         facts['hw_interfaces'].append('eth' + str(ethernet_idx))
