@@ -231,17 +231,17 @@ def get_client(params, module):
 
 
 def get_obj(client, params, module):
+    kwargs = {
+        'custom_properties': format_custom_properties(params['properties']),
+        'description': params['description'],
+        'disable_alerting': bool(params['disable_alerting']),
+        'full_path': params['full_path'],
+        'group_type': 'Normal',
+        'name': parse_name_from_path(params['full_path'], PATH_DELIM)
+    }
     try:
-        name = parse_name_from_path(params['full_path'], PATH_DELIM)
 
-        obj = lm_sdk.RestDeviceGroup(
-            custom_properties=format_custom_properties(params['properties']),
-            description=params['description'],
-            disable_alerting=bool(params['disable_alerting']),
-            full_path=params['full_path'],
-            group_type='Normal',
-            name=name
-        )
+        obj = lm_sdk.RestDeviceGroup(**kwargs)
 
         if 'applies_to' in params and params['applies_to']:
             obj.applies_to = params['applies_to']
