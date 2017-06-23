@@ -352,12 +352,26 @@ def get_client(params, module):
 
 def get_obj(client, params, module):
     obj = None
+    kwargs = {
+        'enable_fail_back': params['enable_fail_back'],
+        'escalating_chain_id': params['escalation_chain_id'],
+        'need_auto_create_collector_device': False
+    }
+
+    if 'backup_collector_id' in params and params['backup_collector_id']:
+        kwargs['backup_agent_id'] = params['backup_collector_id']
+    if 'description' in params and params['description']:
+        kwargs['description'] = params['description']
+    else:
+        kwargs['description'] = socket.getfqdn()
+    if 'id' in params and params['id']:
+        kwargs['id'] = params['id']
+    if 'resend_interval' in params and params['resend_interval']:
+        kwargs['resend_ival'] = params['resend_interval']
+    if 'suppress_alert_clear' in params and params['suppress_alert_clear']:
+        kwargs['suppress_alert_clear'] = params['suppress_alert_clear']
     try:
-        obj = lm_sdk.RestCollector(
-            enable_fail_back=params['enable_fail_back'],
-            escalating_chain_id=params['escalation_chain_id'],
-            need_auto_create_collector_device=False
-        )
+        obj = lm_sdk.RestCollector(**kwargs)
     except Exception as e:
         err = 'Exception creating object: ' + str(e) + '\n'
         module.fail_json(msg=err, changed=False, failed=True)
@@ -375,19 +389,6 @@ def get_obj(client, params, module):
             ' does not exist.'
         )
         module.fail_json(msg=err, changed=False, failed=True)
-
-    if 'backup_collector_id' in params and params['backup_collector_id']:
-        obj.backup_agent_id = params['backup_collector_id']
-    if 'description' in params and params['description']:
-        obj.description = params['description']
-    else:
-        obj.description = socket.getfqdn()
-    if 'id' in params and params['id']:
-        obj.id = params['id']
-    if 'resend_interval' in params and params['resend_interval']:
-        obj.resend_ival = params['resend_interval']
-    if 'suppress_alert_clear' in params and params['suppress_alert_clear']:
-        obj.suppress_alert_clear = params['suppress_alert_clear']
 
     return obj
 
@@ -633,15 +634,14 @@ def download_installer(client, collector, params, module):
         os_and_arch = DEFAULT_OS + '32'
 
     resp = None
+    kwargs = {
+        'collector_size': params['collector_size']
+        # TODO: Restore when API returns this in the collector resource
+        # , 'use_ea': bool(params['use_ea'])
+    }
+    if 'collector_version' in params and params['collector_version']:
+        kwargs['collector_version'] = params['collector_version']
     try:
-        kwargs = {
-            'collector_size': params['collector_size']
-            # TODO: Restore when API returns this in the collector resource
-            # , 'use_ea': bool(params['use_ea'])
-        }
-        if params['collector_version']:
-            kwargs['collector_version'] = params['collector_version']
-
         resp = client.install_collector(
             str(collector.id),
             os_and_arch,
