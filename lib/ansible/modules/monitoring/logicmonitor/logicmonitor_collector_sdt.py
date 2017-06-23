@@ -217,15 +217,16 @@ def get_client(params, module):
 
 
 def get_obj(client, params, module):
+    kwargs = {
+        'collector_id': params['collector_id'],
+        'comment': params['comment'],
+        'end_date_time': params['end_date_time'],
+        'sdt_type': params['sdt_type'],
+        'start_date_time': params['start_time'],
+        'type': 'CollectorSDT'
+    }
     try:
-        obj = lm_sdk.CollectorSDT(
-            collector_id=params['collector_id'],
-            comment=params['comment'],
-            end_date_time=params['end_date_time'],
-            sdt_type=params['sdt_type'],
-            start_date_time=params['start_time'],
-            type='CollectorSDT'
-        )
+        obj = lm_sdk.CollectorSDT(**kwargs)
         return obj
     except Exception as e:
         err = 'Exception creating object: ' + str(e) + '\n'
