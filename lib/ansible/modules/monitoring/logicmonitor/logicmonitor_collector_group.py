@@ -193,11 +193,12 @@ def get_client(params, module):
 
 
 def get_obj(client, params, module):
+    kwargs = {
+        'description': params['description'],
+        'name': params['name']
+    }
     try:
-        obj = lm_sdk.RestCollectorGroup(
-            description=params['description'],
-            name=params['name']
-        )
+        obj = lm_sdk.RestCollectorGroup(**kwargs)
         return obj
 
     except Exception as e:
