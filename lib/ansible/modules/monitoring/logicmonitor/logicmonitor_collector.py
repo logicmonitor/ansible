@@ -370,27 +370,25 @@ def get_obj(client, params, module):
         kwargs['resend_ival'] = params['resend_interval']
     if 'suppress_alert_clear' in params and params['suppress_alert_clear']:
         kwargs['suppress_alert_clear'] = params['suppress_alert_clear']
-    try:
-        obj = lm_sdk.RestCollector(**kwargs)
-    except Exception as e:
-        err = 'Exception creating object: ' + str(e) + '\n'
-        module.fail_json(msg=err, changed=False, failed=True)
-
     collector_group = find_collector_group_id(
         client,
         params['collector_group'],
         module
     )
     if collector_group is not None:
-        obj.collector_group_id = collector_group
+        kwargs['collector_group_id'] = collector_group
     else:
         err = (
             'Collecor group ' + params['collector_group'] +
             ' does not exist.'
         )
         module.fail_json(msg=err, changed=False, failed=True)
-
-    return obj
+    try:
+        obj = lm_sdk.RestCollector(**kwargs)
+        return obj
+    except Exception as e:
+        err = 'Exception creating object: ' + str(e) + '\n'
+        module.fail_json(msg=err, changed=False, failed=True)
 
 
 def set_update_fields(obj_1, obj_2):
