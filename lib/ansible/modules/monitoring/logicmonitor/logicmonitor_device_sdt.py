@@ -241,20 +241,20 @@ def get_client(params, module):
 
 
 def get_obj(client, params, module):
+    kwargs = {
+        'comment': params['comment'],
+        'end_date_time': params['end_date_time'],
+        'sdt_type': params['sdt_type'],
+        'start_date_time': params['start_time'],
+        'type': 'DeviceSDT'
+    }
+    if 'device_id' in params and params['device_id']:
+        kwargs['device_id'] = params['device_id']
+    if 'device_display_name' in params and params['device_display_name']:
+        kwargs['device_display_name'] = params['device_display_name']
+
     try:
-        obj = lm_sdk.DeviceSDT(
-            comment=params['comment'],
-            end_date_time=params['end_date_time'],
-            sdt_type=params['sdt_type'],
-            start_date_time=params['start_time'],
-            type='DeviceSDT'
-        )
-
-        if 'device_id' in params and params['device_id']:
-            obj.device_id = params['device_id']
-        if 'device_display_name' in params and params['device_display_name']:
-            obj.device_display_name = params['device_display_name']
-
+        obj = lm_sdk.DeviceSDT(**kwargs)
         return obj
     except Exception as e:
         err = 'Exception creating object: ' + str(e) + '\n'
