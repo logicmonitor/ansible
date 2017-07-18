@@ -690,7 +690,7 @@ def add_obj(client, collector, module):
 
 
 def delete_obj(client, collector, module):
-    module.debug('deleting collector group ' + str(collector.id))
+    module.debug('deleting collector ' + str(collector.id))
     resp = None
     try:
         resp = client.delete_collector_by_id(str(collector.id))
