@@ -225,6 +225,7 @@ def get_client(params, module):
     )
     lm_sdk.configuration.api_key['id'] = params['access_id']
     lm_sdk.configuration.api_key['Authorization'] = params['access_key']
+    lm_sdk.user_agent = lm_sdk.user_agent + '; Ansible'
 
     # create an instance of the API class
     return lm_sdk.DefaultApi(lm_sdk.ApiClient())
