@@ -79,6 +79,8 @@ Deprecation notices
 The following modules will be removed in Ansible 2.9. Please update update your playbooks accordingly.
 
 * :ref:`fixme <fixme>`
+* logicmonitor
+* logicmonitor_facts
 
 Noteworthy module changes
 -------------------------
